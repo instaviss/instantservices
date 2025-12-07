@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Instaviss</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <style>
+        :root {
+            --bg-color: #F8F9FD;
+            --surface-color: #FFFFFF;
+            --input-bg: #F3F5F7;
+            --text-dark: #0F172A;
+            --text-light: #64748B;
+            --accent: #000000;
+            --success: #10B981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        /* --- CONTAINER --- */
+        .app-container {
+            width: 100%;
+            height: 100vh;
+            background: var(--surface-color);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 30px 24px;
+            transition: all 0.3s ease;
+        }
+
+        /* --- HEADER --- */
+        header {
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .brand-wrapper { display: flex; flex-direction: column; }
+
+        .logo {
+            font-weight: 800;
+            font-size: 2rem;
+            letter-spacing: -0.04em;
+            color: var(--text-dark);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .tagline {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-light);
+            max-width: 200px;
+            line-height: 1.4;
+        }
+
+        .status-dot {
+            width: 8px; height: 8px;
+            background-color: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+            margin-top: 10px;
+        }
+
+        /* --- FORM --- */
+        form {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 100%;
+            position: relative;
+            z-index: 5;
+        }
+
+        .spacer { flex-grow: 1; min-height: 20px; }
+
+        .input-card {
+            background-color: var(--input-bg);
+            border-radius: 20px;
+            padding: 20px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .input-card:focus-within {
+            background-color: #FFFFFF;
+            border-color: #E2E8F0;
+            box-shadow: 0 15px 30px -5px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+
+        .label-text {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+            margin-bottom: 10px;
+        }
+
+        textarea, input, .location-text {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1rem;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        textarea { resize: none; height: 80px; line-height: 1.5; }
+        textarea::placeholder, input::placeholder { color: #94A3B8; font-weight: 400; }
+
+        .location-wrapper {
+            display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+        }
+        .icon-gps { color: var(--text-dark); opacity: 0.3; transition: 0.3s; }
+        .active-gps { color: var(--success); opacity: 1; }
+
+        .submit-container { padding-top: 10px; padding-bottom: 20px; }
+
+        .btn-modern {
+            width: 100%;
+            background: var(--text-dark);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 100px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex; justify-content: center; align-items: center; gap: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 20px -5px rgba(0,0,0,0.3);
+            z-index: 20;
+        }
+        .btn-modern:hover { transform: translateY(-2px); box-shadow: 0 15px 25px -5px rgba(0,0,0,0.3); }
+        .btn-modern:active { transform: scale(0.98); }
+
+        .btn-modern[disabled] {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .spinner {
+            width: 20px; height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- DESKTOP TWEAKS --- */
+        @media (min-width: 1024px) {
+            body { background-color: #F0F2F5; }
+
+            .app-container {
+                max-width: 1200px;
+                height: auto;
+                min-height: 85vh;
+                background: transparent;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0 60px;
+                gap: 80px;
+            }
+
+            header {
+                flex-direction: column;
+                justify-content: center;
+                width: 50%;
+                padding-top: 0;
+            }
+
+            .logo { font-size: 5rem; margin-bottom: 24px; }
+            .tagline {
+                font-size: 1.1rem; max-width: 400px; text-transform: none; font-weight: 400; color: var(--text-dark);
+            }
+            .status-dot { display: none; }
+            .spacer { display: none; }
+
+            form {
+                width: 480px;
+                background: #FFFFFF;
+                padding: 50px;
+                border-radius: 40px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+                flex: none;
+                height: auto;
+            }
+        }
+
+        /* --- ONBOARDING OVERLAY (FIXED) --- */
+        .onboarding-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #FFFFFF;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 40px 30px;
+            transition: opacity 0.5s ease;
+        }
+
+        .onboarding-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+            visibility: hidden;
+        }
+
+        .skip-btn {
+            position: absolute; top: 40px; right: 40px;
+            font-size: 0.9rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--text-light); cursor: pointer;
+            z-index: 10000;
+        }
+
+        .slides-container {
+            flex: 1; display: flex; align-items: center; justify-content: center;
+            max-width: 600px; margin: 0 auto;
+        }
+
+        .slide { display: none; text-align: center; animation: fadeIn 0.6s ease; }
+        .slide.active { display: block; }
+
+        .slide h1 {
+            font-size: 3rem; font-weight: 800; line-height: 1.1;
+            margin-bottom: 20px; letter-spacing: -0.03em; color: var(--text-dark);
+        }
+
+        .slide p {
+            font-size: 1.1rem; color: var(--text-light); font-weight: 400; line-height: 1.6;
+        }
+
+        .action-area { display: flex; justify-content: center; margin-bottom: 20px; }
+
+        .next-circle {
+            width: 70px; height: 70px; border-radius: 50%;
+            background: var(--text-dark); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: transform 0.2s;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            z-index: 10000;
+        }
+        .next-circle:active { transform: scale(0.9); }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="onboarding-overlay" id="onboarding">
+        <div class="skip-btn" id="skipBtn">Skip</div>
+
+        <div class="slides-container">
+            <div class="slide active">
+                <h1>Request<br>Anything.</h1>
+                <p>From Groceries to Pharmacy,<br>Parcels to Custom Errands.</p>
+            </div>
+            <div class="slide">
+                <h1>Instant<br>Dispatch.</h1>
+                <p>We receive your request and<br>send a runner immediately.</p>
+            </div>
+            <div class="slide">
+                <h1>Premium<br>Service.</h1>
+                <p>Sit back and relax.<br>We handle the chaos for you.</p>
+            </div>
+        </div>
+
+        <div class="action-area">
+            <div class="next-circle" id="nextBtn">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container">
+
+        <header>
+            <div class="brand-wrapper">
+                <div class="logo">Instaviss.</div>
+                <div class="tagline">Any services you want in an instant.</div>
+            </div>
+            <div class="status-dot"></div>
+        </header>
+
+        <!-- Formspree action set here -->
+        <form id="appForm" action="https://formspree.io/f/mrbrbyqd" method="POST">
+
+            <div class="spacer"></div>
+
+            <div class="input-card">
+                <span class="label-text">I need...</span>
+                <textarea
+                    name="Order_Details"
+                    placeholder="E.g. Groceries, Pharmacy, Delivery, or Parcel Pickup..."
+                    required></textarea>
+            </div>
+
+            <div class="input-card" id="locationTrigger">
+                <span class="label-text">Where?</span>
+                <div class="location-wrapper">
+                    <span class="location-text" id="locationText">Tap to pin current location</span>
+                    <svg class="icon-gps" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                </div>
+                <!-- Hidden fields to send precise lat/long to Formspree -->
+                <input type="hidden" id="geoLink" name="Maps_Link">
+                <input type="hidden" id="latField" name="Latitude">
+                <input type="hidden" id="longField" name="Longitude">
+            </div>
+
+            <div class="input-card">
+                <span class="label-text">Phone</span>
+                <input type="tel" name="Phone" placeholder="07..." required>
+            </div>
+
+            <div class="submit-container">
+                <!-- disabled by default until location pinned -->
+                <button type="submit" class="btn-modern" id="submitBtn" disabled>
+                    <span id="btnText">Instant Request</span>
+                    <svg id="arrowIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    <div class="spinner" id="loadingSpinner"></div>
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- ONBOARDING ---
+            const onboarding = document.getElementById('onboarding');
+            const slides = document.querySelectorAll('.slide');
+            const nextBtn = document.getElementById('nextBtn');
+            const skipBtn = document.getElementById('skipBtn');
+            let currentSlide = 0;
+
+            function updateSlide() {
+                slides.forEach(s => s.classList.remove('active'));
+                slides[currentSlide].classList.add('active');
+            }
+
+            function closeOnboarding() {
+                onboarding.classList.add('hidden');
+                setTimeout(() => { onboarding.style.display = 'none'; }, 500);
+            }
+
+            nextBtn.addEventListener('click', () => {
+                if (currentSlide < slides.length - 1) {
+                    currentSlide++;
+                    updateSlide();
+                } else {
+                    closeOnboarding();
+                }
+            });
+            skipBtn.addEventListener('click', closeOnboarding);
+
+            // --- FORM LOGIC ---
+            const locationBtn = document.getElementById('locationTrigger');
+            const locationText = document.getElementById('locationText');
+            const geoInput = document.getElementById('geoLink');
+            const latField = document.getElementById('latField');
+            const longField = document.getElementById('longField');
+            const iconGps = document.querySelector('.icon-gps');
+            const form = document.getElementById('appForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const arrowIcon = document.getElementById('arrowIcon');
+            const spinner = document.getElementById('loadingSpinner');
+
+            // Geolocation options
+            const geoOptions = {
+                enableHighAccuracy: true,
+                timeout: 12000,
+                maximumAge: 0
+            };
+
+            function geoErrorHandler(err) {
+                console.warn('Geolocation error', err);
+                switch (err.code) {
+                    case 1:
+                        locationText.innerText = "Location permission denied. Enable it in browser settings.";
+                        break;
+                    case 2:
+                        locationText.innerText = "Position unavailable. Move outside or enable GPS.";
+                        break;
+                    case 3:
+                        locationText.innerText = "Location request timed out. Try again.";
+                        break;
+                    default:
+                        locationText.innerText = "GPS Failed. Type details.";
+                }
+                locationText.style.color = "red";
+                locationText.style.opacity = "1";
+                if (iconGps) iconGps.classList.remove('active-gps');
+            }
+
+            let isLocating = false;
+            locationBtn.addEventListener('click', () => {
+                if (!navigator.geolocation) return alert("Browser does not support GPS");
+                if (isLocating) return;
+
+                isLocating = true;
+                locationText.innerText = "Locating...";
+                locationText.style.opacity = "0.6";
+                locationText.style.color = "var(--text-light)";
+
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        const { latitude: lat, longitude: long } = pos.coords;
+                        // set Google Maps search link with real coords
+                        geoInput.value = `https://www.google.com/maps/search/?api=1&query=${lat},${long}`;
+                        latField.value = lat;
+                        longField.value = long;
+                        console.log('coords:', pos.coords);
+                        locationText.innerText = `✓ Location Pinned — ${lat.toFixed(6)}, ${long.toFixed(6)}`;
+                        locationText.style.color = "var(--text-dark)";
+                        locationText.style.opacity = "1";
+                        locationText.style.fontWeight = "700";
+                        if (iconGps) iconGps.classList.add('active-gps');
+                        // enable submit now that location exists
+                        submitBtn.removeAttribute('disabled');
+                        isLocating = false;
+                    },
+                    (err) => {
+                        geoErrorHandler(err);
+                        isLocating = false;
+                    },
+                    geoOptions
+                );
+            });
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                // double-check: don't allow submit without location
+                if (!geoInput.value) {
+                    alert("Please pin your current location first (tap 'Where?').");
+                    return;
+                }
+
+                // disable UI while sending
+                submitBtn.setAttribute('disabled', '');
+                btnText.style.display = 'none';
+                arrowIcon.style.display = 'none';
+                spinner.style.display = 'block';
+                submitBtn.style.opacity = '0.8';
+
+                const data = new FormData(form);
+
+                try {
+                    const res = await fetch(form.action, {
+                        method: form.method,
+                        body: data,
+                        headers: {'Accept': 'application/json'}
+                    });
+
+                    if (res.ok) {
+                        submitBtn.style.background = "var(--success)";
+                        spinner.style.display = 'none';
+                        btnText.innerText = "Request Sent ✓";
+                        btnText.style.display = 'block';
+                        // clear fields and re-disable submit
+                        form.reset();
+                        geoInput.value = "";
+                        latField.value = "";
+                        longField.value = "";
+                        setTimeout(() => {
+                            submitBtn.style.background = "var(--text-dark)";
+                            btnText.innerText = "Instant Request";
+                            arrowIcon.style.display = 'block';
+                            submitBtn.style.opacity = '1';
+                            locationText.innerText = "Tap to pin current location";
+                            locationText.style.color = "";
+                            if (iconGps) iconGps.classList.remove('active-gps');
+                            // ensure submit disabled until next pin
+                            submitBtn.setAttribute('disabled', '');
+                        }, 2500);
+                    } else {
+                        spinner.style.display = 'none';
+                        btnText.innerText = "Error";
+                        btnText.style.display = 'block';
+                        // re-enable so user can retry (but keep disabled until pin)
+                        submitBtn.setAttribute('disabled', '');
+                    }
+                } catch (err) {
+                    spinner.style.display = 'none';
+                    btnText.innerText = "Error";
+                    btnText.style.display = 'block';
+                    console.error('Submit error', err);
+                    submitBtn.setAttribute('disabled', '');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
